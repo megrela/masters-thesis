@@ -1,0 +1,3 @@
+[submodule "app/algorithm/minimum-angle-dfs"]
+	path = app/algorithm/minimum-angle-dfs
+	url = https://github.com/megrela/minimum-angle-dfs.git
