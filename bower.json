@@ -1,0 +1,30 @@
+{
+  "name": "masters thesis",
+  "authors": [
+    "megrela"
+  ],
+  "description": "project for masters thesis minimum-angle-dfs implementation on delauney triangulation",
+  "main": "index.html",
+  "moduleType": [],
+  "keywords": [
+    "minimum",
+    "angle",
+    "dfs",
+    "heuristic",
+    "delauney",
+    "triangulation"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.1",
+    "bootstrap": "^3.3.6"
+  }
+}

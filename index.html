@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delauney Triangulation</title>
+    <!-- libraries -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- application -->
+    <script src="app/app.js"></script>
+    <script src="app/helper/helper.js"> </script>
+    <script src="app/drawing/drawing.js"></script>
+    <script src="app/graph/graph.js"></script>
+    <script src="app/triangulation/delaunay.triangulation.js"></script>
+    <script src="app/figures/point/point.js"></script>
+    <script src="app/figures/circle/circle.js"></script>
+    <script src="app/figures/triangle/triangle.js"></script>
+    <script src="app/figures/edge/edge.js"></script>
+
+    <script src="app/runner/runner.js"></script>
+
+    <!-- algorithm -->
+    <script src="app/algorithm/minimum-angle-dfs/minimum-angle-dfs.algorithm.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div id="main" class="clearfix">
+        <canvas height="600px" width="600px" class="pull-left"> </canvas>
+        <div id="tools" class="pull-left">
+            <div class="container">
+                <h2>Parameters</h2>
+                <p>(Canvas dimensions are 600px * 600px)</p>
+                <form role="form" class="form">
+                    <div class="form-group">
+                        <label for="number-of-points">Number of Points</label>
+                        <input type="text" class="form-control" id="number-of-points" placeholder="Number of Points" value="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="scale">Scale</label>
+                        <input type="text" class="form-control" id="scale" placeholder="Scale" value="30">
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" id="calculate-btn"> Calculate </button>
+                        <button type="button" class="btn btn-primary" disabled id="add-runners-btn"> Add Runners</button>
+                        <button type="button" class="btn btn-success" disabled id="next-runners-btn"> Next </button>
+                    </div>
+                </form>
+            </div>
+            <div class="container" id="messages">
+
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            app.init();
+        });
+    </script>
+</body>
+</html>
