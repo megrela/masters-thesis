@@ -126,17 +126,18 @@ var app = {
         var secondX = ratio * ( second.direction.x - second.location.x ) + second.location.x;
         var secondY = ratio * ( second.direction.y - second.location.y ) + second.location.y;
 
+        second.prev = second.location;
         second.location = new Point(secondX, secondY);
+        second.location.id = second.prev.id;
         me.drawing.setRunnersLocation(second);
 
         if (targetIsFirst) {
             var cur = me.target.location.id;
-            var adj = me.target.prev;
-            console.log(cur);
-            console.log(adj.id);
-            while (adj.id == me.target.location.id) {
-                adj = me.graph.randomAdjacent(cur);
-                console.log(adj.id);
+            var prev = me.target.prev;
+            var adj = {};
+            while (true) {
+                var adj = me.graph.randomAdjacent(cur);
+                if (adj.id != prev.id) break;
             }
             me.target.direction = adj;
             me.drawing.setRunnersDirection(me.target);
