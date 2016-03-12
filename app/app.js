@@ -6,7 +6,7 @@ var app = {
     config: {},
     init: function() {
         var me = this;
-        me.drawing = new Drawing($('canvas')[0]);
+        me.drawing = new Drawing();
         me.messages = $('#messages');
         me.startListening();
     },
@@ -15,6 +15,7 @@ var app = {
         var me = this;
         var scale = $('#scale').val();
         var points = $('#number-of-points').val();
+
         me.drawing.reset();
         me.messages.text('');
         me.pursuitStarted = false;
@@ -24,12 +25,9 @@ var app = {
             SCALE: scale,
             MIN_X: 1,
             MIN_Y: 1,
-            MAX_X: ( me.drawing.dom.width / scale )- 1,
-            MAX_Y: ( me.drawing.dom.height / scale ) - 1,
-            RUNNER_COLOR: [
-                {location: "red", direction: "blue"},
-                {location: "yellow", direction: "green"}
-            ]
+            MAX_X: ( me.drawing.stage.width() / scale )- 1,
+            MAX_Y: ( me.drawing.stage.height() / scale ) - 1
+
         };
 
         $('#next-runners-btn').attr('disabled', true);
@@ -53,15 +51,12 @@ var app = {
             );
             return;
         }
-
         me.graph = new Graph(me.config.VERTEX_COUNT);
         me.graph.randomizeVertices();
-
-        me.drawing.drawGraphVertices(me.graph);
-
         me.graph.triangulate(DelaunayTriangulation);
         me.graph.buildAdjTable();
 
+        me.drawing.drawGraphVertices(me.graph);
         me.drawing.drawGraphEdges(me.graph);
     },
 
@@ -69,6 +64,7 @@ var app = {
         var me = this;
         var vertex = me.graph.randomVertex();
         var adjVertex = me.graph.randomAdjacent(vertex.id);
+
         me.target = new Runner(vertex, adjVertex, runnerTypes.TARGET);
 
         while (true) {
@@ -79,8 +75,7 @@ var app = {
         }
         me.policeman = new Runner(vertex, null, runnerTypes.POLICEMAN);
 
-        app.drawing.drawRunner(me.target);
-        app.drawing.drawRunner(me.policeman);
+        app.drawing.reDrawRunners([me.target, me.policeman]);
     },
 
     /**
@@ -100,7 +95,8 @@ var app = {
         me.algorithm.tail = me.target.direction.id;
         me.algorithm.start();
         me.policeman.direction = me.graph.vertices[me.algorithm.path[0]];
-        me.drawing.setRunnersDirection(me.policeman);
+
+        app.drawing.reDrawRunners([me.target, me.policeman]);
     },
 
     /**
@@ -121,7 +117,6 @@ var app = {
         var ratio = Math.sqrt( first.distanceSQR() / second.distanceSQR() );
         first.prev = first.location;
         first.location = first.direction;
-        me.drawing.setRunnersLocation(first);
 
         var secondX = ratio * ( second.direction.x - second.location.x ) + second.location.x;
         var secondY = ratio * ( second.direction.y - second.location.y ) + second.location.y;
@@ -129,7 +124,6 @@ var app = {
         second.prev = second.location;
         second.location = new Point(secondX, secondY);
         second.location.id = second.prev.id;
-        me.drawing.setRunnersLocation(second);
 
         if (targetIsFirst) {
             var cur = me.target.location.id;
@@ -140,10 +134,11 @@ var app = {
                 if (adj.id != prev.id) break;
             }
             me.target.direction = adj;
-            me.drawing.setRunnersDirection(me.target);
+
         } else {
             me.dfs();
         }
+        app.drawing.reDrawRunners([me.target, me.policeman]);
     },
 
     startListening: function () {
@@ -163,6 +158,9 @@ var app = {
         $('#next-runners-btn').click(function () {
             if (!me.pursuitStarted) {
                 me.startPursuit();
+                setInterval(function () {
+                    me.nextEvent();
+                }, 250);
             } else {
                 me.nextEvent();
             }
