@@ -92,7 +92,7 @@ Drawing.prototype.reDrawRunners = function (runners) {
         var runner = runners[i];
         this.dom = this.layers.runnerObject;
         this.setRunnersLocation(runner);
-        //this.setRunnersDirection(runner);
+        this.setRunnersDirection(runner);
         this.dom = this.layers.runnerPath;
         this.setRunnersPath(runner);
     }
@@ -134,3 +134,4 @@ Drawing.prototype.setRunnersPath = function (runner) {
         ctx.stroke();
     }
 };
+

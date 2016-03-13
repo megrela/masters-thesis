@@ -105,7 +105,7 @@ var app = {
         if (me.algorithm.path.length > 0) {
             me.policeman.direction = me.graph.vertices[me.algorithm.path[0]];
         } else {
-            me.pursuitFinished = true;
+            me.finishPursuit();
         }
 
         app.drawing.reDrawRunners([me.target, me.policeman]);
@@ -147,21 +147,19 @@ var app = {
                 if (adj.id != prev.id) break;
             }
             me.target.direction = adj;
+            if (me.target.direction.id == me.policeman.location.id) {
+                me.finishPursuit();
+            }
         } else {
             me.dfs();
         }
-        if (me.target.direction.id == me.policeman.prev.id) {
-            me.pursuitFinished = true;
-        }
-
-        if (me.target.location.id == me.policeman.location.id) {
-            me.pursuitFinished = true;
-        }
-
-        if (me.policeman.location.id == me.target.direction.id ) {
-            me.pursuitFinished = true;
-        }
         app.drawing.reDrawRunners([me.target, me.policeman]);
+    },
+
+    finishPursuit: function () {
+        var me = this;
+        me.pursuitFinished = true;
+        alert("caught");
     },
 
     startListening: function () {
@@ -181,14 +179,20 @@ var app = {
         $('#next-runners-btn').click(function () {
             if (!me.pursuitStarted) {
                 me.startPursuit();
-                me.runningThread = setInterval(function () {
-                    if (me.pursuitFinished) {
-                        alert("caught");
-                        clearInterval(me.runningThread);
-                        me.pursuitStarted = false;
-                    }
+                if ($('#automatic-pursuit').is(':checked') == true) {
+                    $('#next-runners-btn').attr('disabled', true);
+                    me.runningThread = setInterval(function () {
+                        if (me.pursuitFinished) {
+                            clearInterval(me.runningThread);
+                        } else {
+                            me.nextEvent();
+                        }
+                    }, 200);
+                }
+            } else {
+                if (!me.pursuitFinished) {
                     me.nextEvent();
-                }, 200);
+                }
             }
         });
     },
@@ -201,4 +205,6 @@ var app = {
             text: data
         }).appendTo(me.messages);
     }
+
+
 };

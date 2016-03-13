@@ -34,7 +34,6 @@
             <canvas id="runner-objects" class="layer"></canvas>
         </div>
 
-
         <div id="tools" class="pull-left">
             <div class="container">
                 <h2>Parameters</h2>
@@ -48,9 +47,19 @@
                         <label for="scale">Scale</label>
                         <input type="text" class="form-control" id="scale" placeholder="Scale" value="30">
                     </div>
+
                     <div class="btn-group">
                         <button type="button" class="btn btn-default" id="calculate-btn"> Calculate </button>
                         <button type="button" class="btn btn-primary" disabled id="add-runners-btn"> Add Runners</button>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label class="checkbox-inline"> <input type="checkbox" id="automatic-pursuit"> automatic </label>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
                         <button type="button" class="btn btn-success" disabled id="next-runners-btn"> Next </button>
                     </div>
                 </form>
