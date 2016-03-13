@@ -14,7 +14,8 @@ function Drawing() {
 
     me.layers = {
         graph: $('canvas')[0],
-        runner: $('canvas')[1]
+        runnerPath: $('canvas')[1],
+        runnerObject: $('canvas')[2]
     };
 
     me.dom = {};
@@ -86,11 +87,14 @@ Drawing.prototype.drawGraphEdges = function (graph) {
 
 
 Drawing.prototype.reDrawRunners = function (runners) {
-    this.resetLayer(this.layers.runner);
+    this.resetLayer(this.layers.runnerObject);
     for (var i=0; i<runners.length; i++) {
         var runner = runners[i];
+        this.dom = this.layers.runnerObject;
         this.setRunnersLocation(runner);
         //this.setRunnersDirection(runner);
+        this.dom = this.layers.runnerPath;
+        this.setRunnersPath(runner);
     }
 };
 
@@ -117,3 +121,16 @@ Drawing.prototype.setRunnersLocation = function (runner) {
     }
 };
 
+Drawing.prototype.setRunnersPath = function (runner) {
+    if (runner.prev !== null && runner.location !== null) {
+        var p1 = runner.prev.scale();
+        var p2 = runner.location.scale();
+        var ctx = this.dom.getContext("2d");
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineWidth = 4;
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = this.config.COLOR.RUNNER[runner.type].location;
+        ctx.stroke();
+    }
+};

@@ -18,7 +18,11 @@ var app = {
 
         me.drawing.reset();
         me.messages.text('');
-        me.pursuitStarted = false;
+
+        if (me.pursuitStarted) {
+            me.pursuitStarted = false;
+            clearInterval(me.runningThread);
+        }
 
         me.config = {
             VERTEX_COUNT: points,
@@ -31,6 +35,8 @@ var app = {
         };
 
         $('#next-runners-btn').attr('disabled', true);
+
+
     },
 
     isValid: function () {
@@ -87,6 +93,7 @@ var app = {
         me.algorithm = new MinimumAngleDfsAlgorithm(me.graph, me.policeman.location.id, me.target.direction.id);
         me.dfs();
         me.pursuitStarted = true;
+        me.pursuitFinished = false;
     },
 
     dfs: function () {
@@ -94,7 +101,12 @@ var app = {
         me.algorithm.source = me.policeman.location.id;
         me.algorithm.tail = me.target.direction.id;
         me.algorithm.start();
-        me.policeman.direction = me.graph.vertices[me.algorithm.path[0]];
+
+        if (me.algorithm.path.length > 0) {
+            me.policeman.direction = me.graph.vertices[me.algorithm.path[0]];
+        } else {
+            me.pursuitFinished = true;
+        }
 
         app.drawing.reDrawRunners([me.target, me.policeman]);
     },
@@ -104,6 +116,7 @@ var app = {
      */
     nextEvent: function () {
         var me = this;
+
         var first = me.target;
         var second = me.policeman;
         var targetIsFirst = true;
@@ -134,9 +147,19 @@ var app = {
                 if (adj.id != prev.id) break;
             }
             me.target.direction = adj;
-
         } else {
             me.dfs();
+        }
+        if (me.target.direction.id == me.policeman.prev.id) {
+            me.pursuitFinished = true;
+        }
+
+        if (me.target.location.id == me.policeman.location.id) {
+            me.pursuitFinished = true;
+        }
+
+        if (me.policeman.location.id == me.target.direction.id ) {
+            me.pursuitFinished = true;
         }
         app.drawing.reDrawRunners([me.target, me.policeman]);
     },
@@ -158,11 +181,14 @@ var app = {
         $('#next-runners-btn').click(function () {
             if (!me.pursuitStarted) {
                 me.startPursuit();
-                setInterval(function () {
+                me.runningThread = setInterval(function () {
+                    if (me.pursuitFinished) {
+                        alert("caught");
+                        clearInterval(me.runningThread);
+                        me.pursuitStarted = false;
+                    }
                     me.nextEvent();
-                }, 250);
-            } else {
-                me.nextEvent();
+                }, 200);
             }
         });
     },

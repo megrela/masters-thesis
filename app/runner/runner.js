@@ -8,7 +8,7 @@ var runnerTypes = {
 };
 
 function Runner(location, direction, type) {
-    this.prev = {};
+    this.prev = null;
     this.location = location;
     this.direction = direction;
     this.type = type;
