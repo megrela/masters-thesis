@@ -79,9 +79,22 @@ var app = {
                 break;
             }
         }
+
         me.policeman = new Runner(vertex, null, runnerTypes.POLICEMAN);
 
-        app.drawing.reDrawRunners([me.target, me.policeman]);
+        while (true) {
+            vertex = me.graph.randomVertex();
+            if ( vertex.id == me.policeman.location.id ) {
+                continue;
+            }
+            if (!(vertex.id == me.target.location.id || vertex.id == me.target.direction.id)) {
+                break;
+            }
+
+        }
+
+        me.secondPoliceman = new Runner(vertex, null, runnerTypes.POLICEMAN);
+        app.drawing.reDrawRunners([me.target, me.policeman, me.secondPoliceman]);
     },
 
     /**
@@ -100,15 +113,27 @@ var app = {
         var me = this;
         me.algorithm.source = me.policeman.location.id;
         me.algorithm.tail = me.target.direction.id;
-        me.algorithm.start();
+        me.algorithm.start([]);
 
         if (me.algorithm.path.length > 0) {
             me.policeman.direction = me.graph.vertices[me.algorithm.path[0]];
+
+            me.algorithm.source = me.secondPoliceman.location.id;
+            me.algorithm.tail = me.target.direction.id;
+            me.algorithm.start([me.target.location.id]);
+
+            if ( me.algorithm.path.length > 0 ) {
+                me.secondPoliceman.direction = me.graph.vertices[me.algorithm.path[0]];
+            } else {
+                me.finishPursuit();
+            }
         } else {
             me.finishPursuit();
         }
 
-        app.drawing.reDrawRunners([me.target, me.policeman]);
+
+
+        app.drawing.reDrawRunners([me.target, me.policeman, me.secondPoliceman]);
     },
 
     /**
@@ -119,24 +144,62 @@ var app = {
 
         var first = me.target;
         var second = me.policeman;
-        var targetIsFirst = true;
+        var third = me.secondPoliceman;
+        var targetIsFirst = false;
 
-        if ( me.policeman.distanceSQR() < me.target.distanceSQR() ){
-            first = me.policeman;
-            second = me.target;
-            targetIsFirst = false;
+        if ( me.policeman.distanceSQR() <= me.secondPoliceman.distanceSQR() ) {
+            if (me.policeman.distanceSQR() < me.target.distanceSQR()) {
+                first = me.policeman;
+                if (me.target.distanceSQR() < me.secondPoliceman.distanceSQR()) {
+                    second = me.target;
+                    third = me.secondPoliceman;
+                } else {
+                    second = me.secondPoliceman;
+                    third = me.target;
+                }
+            } else {
+                targetIsFirst = true;
+                first = me.target;
+                second = me.policeman;
+                third = me.secondPoliceman;
+            }
+        } else {
+            first = me.secondPoliceman;
+            if (me.secondPoliceman.distanceSQR() < me.target.distanceSQR()) {
+                if (me.target.distanceSQR() < me.policeman.distanceSQR()) {
+                    second = me.target;
+                    third = me.policeman;
+                } else {
+                    second = me.policeman;
+                    third = me.target;
+                }
+            } else {
+                targetIsFirst = true;
+                first = me.target;
+                second = me.secondPoliceman;
+                third = me.policeman;
+            }
         }
 
-        var ratio = Math.sqrt( first.distanceSQR() / second.distanceSQR() );
+        var ratio2 = Math.sqrt( first.distanceSQR() / second.distanceSQR() );
+        var ratio3 = Math.sqrt( first.distanceSQR() / third.distanceSQR() );
+
         first.prev = first.location;
         first.location = first.direction;
 
-        var secondX = ratio * ( second.direction.x - second.location.x ) + second.location.x;
-        var secondY = ratio * ( second.direction.y - second.location.y ) + second.location.y;
+        var secondX = ratio2 * ( second.direction.x - second.location.x ) + second.location.x;
+        var secondY = ratio2 * ( second.direction.y - second.location.y ) + second.location.y;
+
+        var thirdX = ratio3 * ( third.direction.x - third.location.x ) + third.location.x;
+        var thirdY = ratio3 * ( third.direction.y - third.location.y ) + third.location.y;
 
         second.prev = second.location;
         second.location = new Point(secondX, secondY);
         second.location.id = second.prev.id;
+
+        third.prev = third.location;
+        third.location = new Point(thirdX, thirdY);
+        third.location.id = third.prev.id;
 
         if (targetIsFirst) {
             var cur = me.target.location.id;
@@ -147,13 +210,14 @@ var app = {
                 if (adj.id != prev.id) break;
             }
             me.target.direction = adj;
-            if (me.target.direction.id == me.policeman.location.id) {
+            if (me.target.direction.id == me.policeman.location.id ||
+                me.target.direction.id == me.secondPoliceman.location.id) {
                 me.finishPursuit();
             }
         } else {
             me.dfs();
         }
-        app.drawing.reDrawRunners([me.target, me.policeman]);
+        app.drawing.reDrawRunners([me.target, me.policeman, me.secondPoliceman]);
     },
 
     finishPursuit: function () {
