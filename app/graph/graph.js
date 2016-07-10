@@ -21,6 +21,7 @@ function Graph(vertexCount) {
 }
 
 Graph.prototype.vertexExists = function (p) {
+    //console.log( p.x +  " " , p.y );
     return this.table[p.x][p.y] !== 0;
 };
 

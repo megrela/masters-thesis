@@ -146,6 +146,7 @@ var app = {
         var second = me.policeman;
         var third = me.secondPoliceman;
         var targetIsFirst = false;
+        var equal = false;
 
         if ( me.policeman.distanceSQR() <= me.secondPoliceman.distanceSQR() ) {
             if (me.policeman.distanceSQR() < me.target.distanceSQR()) {
@@ -163,7 +164,7 @@ var app = {
                 second = me.policeman;
                 third = me.secondPoliceman;
             }
-        } else {
+        } else if ( me.policeman.distanceSQR() > me.secondPoliceman.distanceSQR() ) {
             first = me.secondPoliceman;
             if (me.secondPoliceman.distanceSQR() < me.target.distanceSQR()) {
                 if (me.target.distanceSQR() < me.policeman.distanceSQR()) {
@@ -215,6 +216,13 @@ var app = {
                 me.finishPursuit();
             }
         } else {
+            if (equal) {
+              first.prev = first.location;
+              first.location = first.direction;
+
+              second.prev = second.location;
+              second.location = second.direction;
+            }
             me.dfs();
         }
         app.drawing.reDrawRunners([me.target, me.policeman, me.secondPoliceman]);
