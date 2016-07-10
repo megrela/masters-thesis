@@ -217,10 +217,6 @@ var app = {
             }
         } else {
             if (equal) {
-              first.prev = first.location;
-              first.location = first.direction;
-
-              second.prev = second.location;
               second.location = second.direction;
             }
             me.dfs();
